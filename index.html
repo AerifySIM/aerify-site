@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>eSIM Purchase Successful</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1.5rem; background: #f5f5f5; }
+    .box { max-width: 640px; margin: 2rem auto; background: #fff; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    h1 { margin-top: 0; }
+    pre { background: #f0f0f0; padding: 0.75rem; border-radius: 0.5rem; overflow-x: auto; font-size: 0.85rem;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Payment successful</h1>
+    <p id="msg">Finalizing your eSIM order...</p>
+    <div id="details" style="display:none;">
+      <p>Your eSIM has been created. Below is raw response from Airalo (you can pretty it up later):</p>
+      <pre id="json"></pre>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://esim-backend.yourname.workers.dev"; // same as index.html
+
+    function getSessionIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("session_id");
+    }
+
+    async function finalize() {
+      const sessionId = getSessionIdFromUrl();
+      const msgEl = document.getElementById("msg");
+      const detailsEl = document.getElementById("details");
+      const jsonEl = document.getElementById("json");
+
+      if (!sessionId) {
+        msgEl.textContent = "Missing session_id in URL.";
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + "/complete-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error(data);
+          msgEl.textContent = "There was an issue completing your order.";
+          return;
+        }
+
+        msgEl.textContent = "Your eSIM is ready. Check the details below or in your email.";
+        detailsEl.style.display = "block";
+        jsonEl.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        console.error(err);
+        msgEl.textContent = "Unexpected error finalizing your order.";
+      }
+    }
+
+    finalize();
+  </script>
+</body>
+</html>
