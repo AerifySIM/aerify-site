@@ -50,18 +50,11 @@
         box-sizing: border-box;
     }
 
-    #search:focus {
-        outline: none;
-        border-color: #0071e3;
-        box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
-    }
-
-    /* Country Results */
+    /* Country Grid */
     .country-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 16px;
-        margin-top: 20px;
     }
 
     .country-card {
@@ -73,12 +66,13 @@
         align-items: center;
         gap: 15px;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.2s;
     }
 
     .country-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        border-color: var(--primary);
     }
 
     .country-card img {
@@ -86,20 +80,22 @@
         height: 30px;
         object-fit: cover;
         border-radius: 4px;
+        border: 1px solid #eee;
     }
 
-    /* Detail View Styles */
-    .breadcrumb {
-        font-size: 14px;
-        color: var(--secondary);
-        margin-bottom: 10px;
-    }
+    /* Detail View */
+    .breadcrumb { font-size: 14px; color: var(--secondary); margin-bottom: 15px; }
+    .back-link { cursor: pointer; color: #0071e3; text-decoration: none; font-weight: 500; }
 
-    .detail-header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 30px;
+    .detail-header { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
+    
+    .validity-section { margin-bottom: 40px; }
+    .validity-title { 
+        font-size: 18px; 
+        font-weight: 600; 
+        margin-bottom: 15px; 
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
     }
 
     .package-grid {
@@ -115,42 +111,35 @@
         padding: 24px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         transition: border-color 0.2s;
     }
 
     .pkg-card:hover { border-color: #000; }
-
     .pkg-data { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-    .pkg-duration { color: var(--secondary); font-size: 14px; margin-bottom: 20px; }
+    .pkg-subtext { color: var(--secondary); font-size: 14px; margin-bottom: 20px; }
     
     .price-row {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: center;
         margin-top: auto;
     }
 
     .pkg-price { font-size: 20px; font-weight: 600; }
-
     .go-btn {
-        background: #f5f5f7;
+        background: var(--accent);
         border: none;
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         cursor: pointer;
-        font-weight: bold;
-        transition: background 0.2s;
+        font-size: 18px;
+        transition: all 0.2s;
     }
 
-    .pkg-card:hover .go-btn {
-        background: #000;
-        color: #fff;
-    }
+    .pkg-card:hover .go-btn { background: #000; color: #fff; }
 
     .hidden { display: none; }
-    .back-link { cursor: pointer; color: #0071e3; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -158,9 +147,9 @@
 <div class="container">
     <div id="main-view">
         <div class="hero-section">
-            <h1>Where to next?</h1>
+            <h1>Destinations</h1>
             <div class="search-wrapper">
-                <input type="text" id="search" placeholder="Search destinations...">
+                <input type="text" id="search" placeholder="Search for a country...">
             </div>
         </div>
         <div id="country-list" class="country-grid"></div>
@@ -168,23 +157,27 @@
 
     <div id="detail-view" class="hidden">
         <nav class="breadcrumb">
-            <span class="back-link" onclick="showMainView()">Store</span> / <span id="bread-country">Country</span>
+            <span class="back-link" onclick="showMainView()">Destinations</span> / <span id="bread-country">Country</span>
         </nav>
         
-        <div class="detail-header" id="detail-header-content">
-            </div>
-
-        <div id="package-list" class="package-grid"></div>
+        <div class="detail-header" id="detail-header-content"></div>
+        <div id="package-sections"></div>
     </div>
 
-    <div id="status" style="text-align:center; margin-top:40px; color:#888;">Fetching latest plans...</div>
+    <div id="status" style="text-align:center; margin-top:50px; color:#999;">Loading eSIM plans...</div>
 </div>
 
 <script>
 const API_BASE = "https://backend.tayre0089.workers.dev";
 let allPlans = [];
 
-/* --- Load Data --- */
+/* --- Extract Days from Name String --- */
+function extractDays(name) {
+    // Looks for a number followed by "day" or "days" (e.g., "30 days")
+    const match = name.match(/(\d+)\s*day/i);
+    return match ? parseInt(match[1]) : 0;
+}
+
 async function loadPlans() {
     try {
         const res = await fetch(API_BASE + "/products");
@@ -192,11 +185,10 @@ async function loadPlans() {
         document.getElementById("status").style.display = "none";
         renderCountries();
     } catch (e) {
-        document.getElementById("status").textContent = "Connection error.";
+        document.getElementById("status").textContent = "Failed to load products.";
     }
 }
 
-/* --- Render List --- */
 function renderCountries() {
     const q = document.getElementById("search").value.toLowerCase();
     const list = document.getElementById("country-list");
@@ -209,16 +201,12 @@ function renderCountries() {
         const pkg = allPlans.find(p => p.country === name);
         const card = document.createElement("div");
         card.className = "country-card";
-        card.innerHTML = `
-            <img src="${pkg.imageUrl || ''}">
-            <span style="font-weight:500">${name}</span>
-        `;
+        card.innerHTML = `<img src="${pkg.imageUrl}"> <span>${name}</span>`;
         card.onclick = () => showDetail(name);
         list.appendChild(card);
     });
 }
 
-/* --- Show Packages --- */
 function showDetail(countryName) {
     document.getElementById("main-view").classList.add("hidden");
     document.getElementById("detail-view").classList.remove("hidden");
@@ -226,30 +214,52 @@ function showDetail(countryName) {
     window.scrollTo(0,0);
 
     const pkgs = allPlans.filter(p => p.country === countryName);
+    
+    // Header
     const header = document.getElementById("detail-header-content");
     header.innerHTML = `
         <img src="${pkgs[0].imageUrl}" style="width:50px; border-radius:8px;">
         <h2 style="font-size:32px; margin:0">eSIM for ${countryName}</h2>
     `;
 
-    const pkgList = document.getElementById("package-list");
-    pkgList.innerHTML = "";
+    // Grouping by extracted days
+    const sectionsContainer = document.getElementById("package-sections");
+    sectionsContainer.innerHTML = "";
 
-    // Sort by price
-    pkgs.sort((a,b) => a.priceUSD - b.priceUSD).forEach(pkg => {
-        const card = document.createElement("div");
-        card.className = "pkg-card";
-        card.innerHTML = `
-            <div>
-                <div class="pkg-data">${pkg.dataAmount}</div>
-                <div class="pkg-duration">${pkg.validityDays} days</div>
-            </div>
-            <div class="price-row">
-                <div class="pkg-price">$${pkg.priceUSD.toFixed(2)}</div>
-                <button class="go-btn" onclick="buyEsim('${pkg.id}', this)">→</button>
-            </div>
-        `;
-        pkgList.appendChild(card);
+    const groups = {};
+    pkgs.forEach(p => {
+        const days = extractDays(p.name);
+        if (!groups[days]) groups[days] = [];
+        groups[days].push(p);
+    });
+
+    // Sort groups by day count
+    Object.keys(groups).sort((a,b) => a - b).forEach(days => {
+        const section = document.createElement("div");
+        section.className = "validity-section";
+        section.innerHTML = `<div class="validity-title">${days > 0 ? days + ' Days' : 'Plan Details'}</div>`;
+        
+        const grid = document.createElement("div");
+        grid.className = "package-grid";
+
+        groups[days].sort((a,b) => a.priceUSD - b.priceUSD).forEach(pkg => {
+            const card = document.createElement("div");
+            card.className = "pkg-card";
+            card.innerHTML = `
+                <div>
+                    <div class="pkg-data">${pkg.dataAmount}</div>
+                    <div class="pkg-subtext">Validity: ${days > 0 ? days + ' days' : 'See name'}</div>
+                </div>
+                <div class="price-row">
+                    <div class="pkg-price">$${pkg.priceUSD.toFixed(2)}</div>
+                    <button class="go-btn" onclick="buyEsim('${pkg.id}', this)">→</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        section.appendChild(grid);
+        sectionsContainer.appendChild(section);
     });
 }
 
@@ -258,8 +268,8 @@ function showMainView() {
     document.getElementById("main-view").classList.remove("hidden");
 }
 
-/* --- Checkout --- */
 async function buyEsim(packageId, btn) {
+    const original = btn.textContent;
     btn.textContent = "...";
     try {
         const res = await fetch(API_BASE + "/create-checkout", {
@@ -270,14 +280,13 @@ async function buyEsim(packageId, btn) {
         const data = await res.json();
         if (data.url) window.location.href = data.url;
     } catch (err) {
-        alert("Payment system unavailable.");
-        btn.textContent = "→";
+        alert("Payment error.");
+        btn.textContent = original;
     }
 }
 
 document.getElementById("search").addEventListener("input", renderCountries);
 loadPlans();
 </script>
-
 </body>
 </html>
