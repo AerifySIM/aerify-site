@@ -261,8 +261,7 @@ async function loadPackages() {
     const all = await res.json();
 
     // Filter by country code or name
-    allProducts = all.filter(p => p.countryCode === CC || p.country === CNAME);
-
+allProducts = all.filter(p => p.country === CNAME);
     if (!allProducts.length) {
       document.getElementById('pkg-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 24px;color:#6b7280"><h3 style="font-size:18px;margin-bottom:8px">No plans found</h3><p>No eSIM plans available for this destination.</p></div>';
       updateCountryHeader(null);
