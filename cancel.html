@@ -1,67 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Payment Canceled – eSIM Store</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: system-ui, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 {
-            margin-top: 0;
-            font-size: 28px;
-        }
-        .cancel-icon {
-            font-size: 64px;
-            margin: 10px 0;
-        }
-        p {
-            font-size: 16px;
-            color: #555;
-            margin: 20px 0;
-        }
-        .button {
-            display: inline-block;
-            background: black;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .button:hover {
-            background: #333;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payment Cancelled — Aerify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#0891b2;--navy:#0c1a2e;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--t1:#111827;--t2:#6b7280}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:440px;width:100%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.icon{font-size:52px;margin-bottom:20px}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.5px;margin-bottom:10px}
+p{color:var(--t2);font-size:15px;margin-bottom:6px}
+.divider{height:1px;background:var(--border);margin:28px 0}
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn-primary{background:var(--navy);color:#fff;text-decoration:none;padding:13px 24px;border-radius:9999px;font-size:15px;font-weight:600;transition:background .15s;display:block}
+.btn-primary:hover{background:var(--accent)}
+.btn-secondary{border:1px solid var(--border);color:var(--t2);text-decoration:none;padding:12px 24px;border-radius:9999px;font-size:15px;font-weight:500;transition:all .15s;display:block}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:var(--navy);text-decoration:none;position:fixed;top:20px;left:28px}
+.logo span{color:var(--accent)}
+</style>
 </head>
 <body>
-    <div class="card">
-        <div class="cancel-icon">❌</div>
-        <h1>Payment Canceled</h1>
-        <p>Your payment was not completed. No charges have been made.</p>
-        <p>If you encountered any issues, please try again or contact support.</p>
-        <a href="/" class="button">← Try Again</a>
-    </div>
+<a href="index.html" class="logo">Aeri<span>fy</span></a>
+<div class="card">
+  <div class="icon">❌</div>
+  <h1>Payment Cancelled</h1>
+  <p>Your payment was not completed.</p>
+  <p>No charges have been made to your account.</p>
+  <div class="divider"></div>
+  <div class="actions">
+    <a href="javascript:history.back()" class="btn-primary">← Try Again</a>
+    <a href="index.html" class="btn-secondary">Back to Store</a>
+  </div>
+</div>
 </body>
 </html>

@@ -1,122 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Payment Successful – eSIM Store</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: system-ui, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 { margin-top: 0; font-size: 28px; }
-        .success-icon { font-size: 64px; margin: 10px 0; }
-        #status {
-            margin: 20px 0;
-            font-size: 16px;
-            color: #555;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #e5e5e5;
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            flex-shrink: 0;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .done { color: #1a7a3c; font-weight: 500; }
-        .error { color: #d32f2f; font-weight: 500; }
-        p { font-size: 15px; color: #666; margin: 0 0 20px; }
-        .button {
-            display: inline-block;
-            background: black;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .button:hover { background: #333; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payment Successful — Aerify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#0891b2;--navy:#0c1a2e;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--t1:#111827;--t2:#6b7280;--green:#059669;--green-l:#d1fae5;--red:#dc2626}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.icon{font-size:56px;margin-bottom:20px}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.5px;margin-bottom:10px}
+.sub{color:var(--t2);font-size:15px;margin-bottom:28px}
+#status{margin:20px 0;font-size:15px;color:var(--t2);min-height:44px;display:flex;align-items:center;justify-content:center;gap:10px}
+.spinner{width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.done-msg{color:var(--green);font-weight:600}
+.err-msg{color:var(--red);font-weight:500}
+.divider{height:1px;background:var(--border);margin:24px 0}
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn-primary{background:var(--navy);color:#fff;text-decoration:none;padding:13px 24px;border-radius:9999px;font-size:15px;font-weight:600;transition:background .15s;display:block}
+.btn-primary:hover{background:var(--accent)}
+.btn-secondary{background:none;border:1px solid var(--border);color:var(--t2);text-decoration:none;padding:12px 24px;border-radius:9999px;font-size:15px;font-weight:500;transition:all .15s;display:block}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:var(--navy);text-decoration:none;position:fixed;top:20px;left:28px}
+.logo span{color:var(--accent)}
+</style>
 </head>
 <body>
-    <div class="card">
-        <div class="success-icon">✅</div>
-        <h1>Payment Successful!</h1>
-        <p>Thank you for your purchase. Your eSIM details will be sent to your email shortly.</p>
-        <div id="status">
-            <div class="spinner" id="spinner"></div>
-            <span id="status-text">Completing your order...</span>
-        </div>
-        <a href="/" class="button">← Back to Store</a>
-    </div>
+<a href="index.html" class="logo">Aeri<span>fy</span></a>
+<div class="card">
+  <div class="icon">✅</div>
+  <h1>Payment Successful!</h1>
+  <p class="sub">Thank you for your purchase. Your eSIM details will be emailed to you shortly.</p>
+  <div id="status">
+    <div class="spinner" id="spinner"></div>
+    <span id="status-text">Confirming your order…</span>
+  </div>
+  <div class="divider"></div>
+  <div class="actions">
+    <a href="my-esims.html" class="btn-primary">View My eSIMs →</a>
+    <a href="index.html" class="btn-secondary">← Back to Store</a>
+  </div>
+</div>
 
-    <script>
-        const API_BASE = "https://backend.tayre0089.workers.dev";
-        const statusText = document.getElementById("status-text");
-        const spinner = document.getElementById("spinner");
-        const sessionId = new URLSearchParams(window.location.search).get("session_id");
+<script>
+const API_BASE = 'https://backend.tayre0089.workers.dev';
+const spinner = document.getElementById('spinner');
+const statusText = document.getElementById('status-text');
+const sessionId = new URLSearchParams(location.search).get('session_id');
 
-        if (!sessionId) {
-            spinner.style.display = "none";
-            statusText.innerHTML = '<span class="error">Missing session info. Please contact support.</span>';
-        } else {
-            pollStatus();
-        }
+if (!sessionId) {
+  spinner.style.display = 'none';
+  statusText.innerHTML = '<span class="err-msg">Missing session info. Contact support.</span>';
+} else {
+  poll();
+}
 
-        async function pollStatus(attempts = 0) {
-            if (attempts > 12) {
-                spinner.style.display = "none";
-                statusText.textContent = "Still processing — check your email for your eSIM.";
-                return;
-            }
-
-            try {
-                const res = await fetch(`${API_BASE}/order-status?session_id=${encodeURIComponent(sessionId)}`);
-                if (!res.ok) throw new Error("status check failed");
-                const { status } = await res.json();
-
-                if (status === "fulfilled") {
-                    spinner.style.display = "none";
-                    statusText.innerHTML = '<span class="done">✓ Order complete! Check your email for your eSIM.</span>';
-                } else if (status === "processing") {
-                    statusText.textContent = "Processing your order...";
-                    setTimeout(() => pollStatus(attempts + 1), 3000);
-                } else {
-                    // pending — webhook hasn't fired yet, keep polling
-                    statusText.textContent = "Confirming payment...";
-                    setTimeout(() => pollStatus(attempts + 1), 3000);
-                }
-            } catch {
-                setTimeout(() => pollStatus(attempts + 1), 4000);
-            }
-        }
-    </script>
+async function poll(attempts = 0) {
+  if (attempts > 14) {
+    spinner.style.display = 'none';
+    statusText.textContent = 'Still processing — check your email or visit My eSIMs.';
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/order-status?session_id=${encodeURIComponent(sessionId)}`);
+    if (!res.ok) throw new Error();
+    const { status } = await res.json();
+    if (status === 'fulfilled') {
+      spinner.style.display = 'none';
+      statusText.innerHTML = '<span class="done-msg">✓ Order complete! Check your email for your eSIM.</span>';
+    } else if (status === 'processing') {
+      statusText.textContent = 'Processing your order…';
+      setTimeout(() => poll(attempts + 1), 3000);
+    } else {
+      statusText.textContent = 'Confirming payment…';
+      setTimeout(() => poll(attempts + 1), 3000);
+    }
+  } catch {
+    setTimeout(() => poll(attempts + 1), 4000);
+  }
+}
+</script>
 </body>
 </html>

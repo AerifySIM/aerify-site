@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSIM — Aerify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#0891b2;--accent-h:#0e7490;--accent-l:rgba(8,145,178,.1);
+  --navy:#0c1a2e;--navy2:#162235;
+  --bg:#f8fafc;--card:#fff;--border:#e2e8f0;
+  --t1:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --green:#059669;--green-l:#d1fae5;
+  --red:#dc2626;--red-l:#fee2e2;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--r-full:9999px;
+  --sh-sm:0 1px 3px rgba(0,0,0,.07);--sh-md:0 4px 12px rgba(0,0,0,.08);--sh-lg:0 8px 24px rgba(0,0,0,.1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;padding-bottom:120px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-in{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:24px}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:var(--navy);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:var(--r-sm);transition:all .15s}
+.nav-links a:hover{color:var(--t1);background:var(--bg)}
+#my-esims-nav{display:none}
+.nav-right{margin-left:auto}
+.btn-signin{background:var(--navy);color:#fff;border:none;padding:8px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.btn-signin:hover{background:var(--accent)}
+
+/* BREADCRUMB */
+.breadcrumb{max-width:1100px;margin:0 auto;padding:16px 24px 0;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--t3)}
+.breadcrumb a{color:var(--t2);text-decoration:none;transition:color .15s}
+.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb svg{flex-shrink:0}
+
+/* COUNTRY HEADER */
+.country-hero{background:linear-gradient(140deg,#0c1a2e 0%,#0f2847 50%,#0a2240 100%);color:#fff;padding:40px 24px 48px;position:relative;overflow:hidden}
+.country-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(8,145,178,.15) 0%,transparent 60%);pointer-events:none}
+.ch-in{max-width:1100px;margin:0 auto;position:relative;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.ch-flag{width:80px;height:60px;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,.15);flex-shrink:0}
+.ch-flag-fb{width:80px;height:60px;background:rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.ch-text h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(28px,4vw,42px);letter-spacing:-.5px;margin-bottom:6px}
+.ch-text p{color:rgba(255,255,255,.55);font-size:15px}
+.ch-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ch-badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);padding:4px 12px;border-radius:var(--r-full);font-size:12px;font-weight:500}
+
+/* MAIN LAYOUT */
+.main{max-width:1100px;margin:0 auto;padding:40px 24px}
+
+/* OPERATOR GROUP */
+.op-group{margin-bottom:48px}
+.op-header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.op-logo{width:44px;height:44px;object-fit:contain;border-radius:10px;border:1px solid var(--border);background:#fff;padding:4px}
+.op-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px}
+.op-type{font-size:13px;color:var(--t2);margin-top:2px}
+.op-networks{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 24px}
+.net-tag{background:var(--accent-l);color:var(--accent-h);font-size:12px;font-weight:500;padding:3px 10px;border-radius:var(--r-full);border:1px solid rgba(8,145,178,.2)}
+.op-info-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.op-info-item{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:5px}
+.op-info-item svg{color:var(--accent);flex-shrink:0}
+
+/* PACKAGE GRID */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.pkg-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-lg);padding:22px 18px 18px;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;user-select:none}
+.pkg-card:hover{border-color:var(--accent);box-shadow:var(--sh-md)}
+.pkg-card.selected{border-color:var(--accent);background:rgba(8,145,178,.04)}
+.pkg-card.selected .check-dot{display:flex}
+.check-dot{display:none;position:absolute;top:12px;right:12px;width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;font-size:12px;font-weight:700;align-items:center;justify-content:center}
+.pkg-data{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:var(--navy);letter-spacing:-.5px;line-height:1;margin-bottom:4px}
+.pkg-days{font-size:14px;color:var(--t2);margin-bottom:auto;padding-bottom:16px}
+.pkg-divider{height:1px;background:var(--border);margin:0 -18px 16px}
+.pkg-price{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px;color:var(--t1)}
+.pkg-per{font-size:12px;color:var(--t3);margin-top:2px}
+.pkg-unlimited-badge{display:inline-block;background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--r-full);margin-bottom:6px;border:1px solid #fde68a}
+
+/* STICKY BUY BAR */
+.buy-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:16px 24px;z-index:50;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.buy-bar.show{transform:translateY(0)}
+.bb-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.bb-info{}
+.bb-plan{font-weight:600;font-size:16px}
+.bb-price{font-size:14px;color:var(--t2);margin-top:1px}
+.btn-buy{background:var(--navy);color:#fff;border:none;padding:14px 36px;border-radius:var(--r-full);font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;white-space:nowrap;min-width:160px}
+.btn-buy:hover:not(:disabled){background:var(--accent)}
+.btn-buy:disabled{opacity:.55;cursor:not-allowed}
+.btn-buy.loading{pointer-events:none}
+
+/* SKELETON */
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-lg);height:160px;border:none;cursor:default}
+.skel:hover{transform:none;box-shadow:none;border:none}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* DIVIDER */
+.section-divider{display:flex;align-items:center;gap:12px;margin:32px 0 20px;color:var(--t3);font-size:13px}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 24px;margin-top:auto}
+.foot-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:var(--t1);text-decoration:none}
+.foot-logo span{color:var(--accent)}
+.foot-copy{font-size:13px;color:var(--t3)}
+
+/* ALERTS */
+.alert{padding:14px 18px;border-radius:var(--r-md);font-size:14px;margin-bottom:20px;display:none}
+.alert.show{display:flex;align-items:center;gap:10px}
+.alert-error{background:var(--red-l, #fee2e2);color:#991b1b;border:1px solid #fca5a5}
+
+@media(max-width:640px){
+  .ch-flag,.ch-flag-fb{width:56px;height:42px;font-size:26px}
+  .ch-text h1{font-size:26px}
+  .nav-links{display:none}
+  .bb-in{flex-direction:column;align-items:stretch}
+  .btn-buy{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">Aeri<span>fy</span></a>
+    <div class="nav-links">
+      <a href="index.html">Destinations</a>
+      <a href="my-esims.html" id="my-esims-nav">My eSIMs</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-signin" id="auth-btn">Sign In</button>
+    </div>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Destinations</a>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+  <span id="bread-name">Loading…</span>
+</div>
+
+<section class="country-hero" id="country-hero">
+  <div class="ch-in">
+    <div id="ch-flag-wrap"></div>
+    <div class="ch-text">
+      <h1 id="ch-title">Loading…</h1>
+      <p id="ch-sub">eSIM plans — instant activation</p>
+      <div class="ch-badges" id="ch-badges"></div>
+    </div>
+  </div>
+</section>
+
+<div class="main" id="main-content">
+  <div id="alert" class="alert alert-error">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="alert-msg"></span>
+  </div>
+  <div class="pkg-grid" id="pkg-grid">
+    <div class="pkg-card skel"></div><div class="pkg-card skel"></div>
+    <div class="pkg-card skel"></div><div class="pkg-card skel"></div>
+    <div class="pkg-card skel"></div><div class="pkg-card skel"></div>
+  </div>
+</div>
+
+<!-- Sticky buy bar -->
+<div class="buy-bar" id="buy-bar">
+  <div class="bb-in">
+    <div class="bb-info">
+      <div class="bb-plan" id="bb-plan">Select a plan</div>
+      <div class="bb-price" id="bb-price"></div>
+    </div>
+    <button class="btn-buy" id="buy-btn" onclick="handleBuy()">Buy Now</button>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-in">
+    <a href="index.html" class="foot-logo">Aeri<span>fy</span></a>
+    <span class="foot-copy">© 2025 Aerify. Powered by Airalo.</span>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════
+   CONFIG — update these values
+   ═══════════════════════════════ */
+const AUTH0_DOMAIN    = 'YOUR_AUTH0_DOMAIN';
+const AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
+const API_BASE        = 'https://backend.tayre0089.workers.dev';
+/* ═══════════════════════════════ */
+
+const params     = new URLSearchParams(location.search);
+const CC         = params.get('cc') || '';
+const CNAME      = decodeURIComponent(params.get('name') || 'Unknown');
+
+let auth0Client  = null;
+let selectedPkg  = null;
+let allProducts  = [];
+
+document.title = `eSIM for ${CNAME} — Aerify`;
+document.getElementById('bread-name').textContent = CNAME;
+document.getElementById('ch-title').textContent = `eSIM for ${CNAME}`;
+
+(async () => {
+  await initAuth0();
+  await loadPackages();
+  // After login, auto-checkout if pending
+  const pending = sessionStorage.getItem('aerify_checkout');
+  if (pending && auth0Client && await auth0Client.isAuthenticated().catch(()=>false)) {
+    sessionStorage.removeItem('aerify_checkout');
+    const pkg = allProducts.find(p => p.id === pending);
+    if (pkg) { selectPackage(pkg); await handleBuy(); }
+  }
+})();
+
+async function initAuth0() {
+  try {
+    auth0Client = await auth0.createAuth0Client({
+      domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
+      authorizationParams: { redirect_uri: `${location.origin}/country.html` }
+    });
+    if (location.search.includes('code=') && location.search.includes('state=')) {
+      await auth0Client.handleRedirectCallback();
+      window.history.replaceState({}, document.title, `country.html?cc=${CC}&name=${encodeURIComponent(CNAME)}`);
+    }
+    updateNavAuth();
+  } catch(e) { console.warn('Auth0 init', e); }
+}
+
+async function updateNavAuth() {
+  if (!auth0Client) return;
+  const isAuth = await auth0Client.isAuthenticated().catch(()=>false);
+  const btn = document.getElementById('auth-btn');
+  const myNav = document.getElementById('my-esims-nav');
+  if (isAuth) {
+    btn.textContent = 'Sign Out';
+    btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: `${location.origin}/index.html` } });
+    if (myNav) myNav.style.display = 'inline';
+  } else {
+    btn.textContent = 'Sign In';
+    btn.onclick = () => loginAndReturn();
+  }
+}
+
+function loginAndReturn() {
+  if (selectedPkg) sessionStorage.setItem('aerify_checkout', selectedPkg.id);
+  auth0Client.loginWithRedirect({
+    authorizationParams: { redirect_uri: `${location.origin}/country.html?cc=${CC}&name=${encodeURIComponent(CNAME)}` }
+  });
+}
+
+async function loadPackages() {
+  try {
+    const res = await fetch(`${API_BASE}/products`);
+    if (!res.ok) throw new Error();
+    const all = await res.json();
+
+    // Filter by country code or name
+    allProducts = all.filter(p => p.countryCode === CC || p.country === CNAME);
+
+    if (!allProducts.length) {
+      document.getElementById('pkg-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 24px;color:#6b7280"><h3 style="font-size:18px;margin-bottom:8px">No plans found</h3><p>No eSIM plans available for this destination.</p></div>';
+      updateCountryHeader(null);
+      return;
+    }
+
+    updateCountryHeader(allProducts[0]);
+    renderPackages(allProducts);
+  } catch(e) {
+    showAlert('Failed to load packages. Please refresh and try again.');
+    document.getElementById('pkg-grid').innerHTML = '';
+  }
+}
+
+function updateCountryHeader(pkg) {
+  const flagWrap = document.getElementById('ch-flag-wrap');
+  const badges = document.getElementById('ch-badges');
+  if (pkg) {
+    flagWrap.innerHTML = `<img class="ch-flag" src="${pkg.imageUrl}" alt="${CNAME}" onerror="this.outerHTML='<div class=ch-flag-fb>🌍</div>'">`;
+    badges.innerHTML = `
+      <span class="ch-badge">📱 Instant activation</span>
+      <span class="ch-badge">✉️ Email delivery</span>
+      <span class="ch-badge">💳 No commitment</span>`;
+  } else {
+    flagWrap.innerHTML = '<div class="ch-flag-fb">🌍</div>';
+  }
+}
+
+function renderPackages(pkgs) {
+  // Group by operator
+  const ops = {};
+  for (const p of pkgs) {
+    const key = p.operator;
+    if (!ops[key]) ops[key] = [];
+    ops[key].push(p);
+  }
+
+  const grid = document.getElementById('pkg-grid');
+  grid.innerHTML = '';
+  grid.style.display = 'block';
+
+  let first = true;
+  for (const [opName, opPkgs] of Object.entries(ops)) {
+    if (!first) {
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      div.innerHTML = `<span>${opName}</span>`;
+      grid.appendChild(div);
+    }
+    first = false;
+
+    const g = document.createElement('div');
+    g.className = 'pkg-grid';
+    g.style.marginBottom = '0';
+
+    opPkgs.sort((a, b) => a.priceUSD - b.priceUSD).forEach(pkg => {
+      const card = document.createElement('div');
+      card.className = 'pkg-card';
+      card.id = `pkg-${pkg.id}`;
+      const isUnlimited = typeof pkg.dataAmount === 'string' && pkg.dataAmount.toLowerCase().includes('unlimited');
+      card.innerHTML = `
+        <div class="check-dot">✓</div>
+        ${isUnlimited ? '<div class="pkg-unlimited-badge">Unlimited</div>' : ''}
+        <div class="pkg-data">${pkg.dataAmount}</div>
+        <div class="pkg-days">${pkg.validityDays} day${pkg.validityDays !== 1 ? 's' : ''} validity</div>
+        <div class="pkg-divider"></div>
+        <div class="pkg-price">$${pkg.priceUSD.toFixed(2)}</div>
+        <div class="pkg-per">$${(pkg.priceUSD / pkg.validityDays).toFixed(2)}/day</div>`;
+      card.addEventListener('click', () => selectPackage(pkg));
+      g.appendChild(card);
+    });
+    grid.appendChild(g);
+  }
+}
+
+function selectPackage(pkg) {
+  // Deselect all
+  document.querySelectorAll('.pkg-card.selected').forEach(c => c.classList.remove('selected'));
+  // Select clicked
+  const card = document.getElementById(`pkg-${pkg.id}`);
+  if (card) card.classList.add('selected');
+  selectedPkg = pkg;
+  // Update buy bar
+  document.getElementById('bb-plan').textContent = `${pkg.dataAmount} · ${pkg.validityDays} days`;
+  document.getElementById('bb-price').textContent = `$${pkg.priceUSD.toFixed(2)} USD — ${pkg.operator}`;
+  document.getElementById('buy-bar').classList.add('show');
+  document.getElementById('buy-btn').disabled = false;
+}
+
+async function handleBuy() {
+  if (!selectedPkg) return;
+
+  const btn = document.getElementById('buy-btn');
+  const isAuth = auth0Client ? await auth0Client.isAuthenticated().catch(()=>false) : false;
+
+  if (!isAuth) {
+    loginAndReturn();
+    return;
+  }
+
+  btn.textContent = 'Loading…';
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const token = await auth0Client.getTokenSilently().catch(() => null);
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE}/create-checkout`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ packageId: selectedPkg.id })
+    });
+    const data = await res.json();
+    if (data.url) { window.location.href = data.url; }
+    else { throw new Error(data.error || 'No checkout URL'); }
+  } catch(e) {
+    showAlert('Payment error: ' + e.message);
+    btn.textContent = 'Buy Now';
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function showAlert(msg) {
+  const el = document.getElementById('alert');
+  document.getElementById('alert-msg').textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 6000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My eSIMs — Aerify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#0891b2;--accent-h:#0e7490;--accent-l:rgba(8,145,178,.1);
+  --navy:#0c1a2e;--navy2:#162235;
+  --bg:#f8fafc;--card:#fff;--border:#e2e8f0;
+  --t1:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --green:#059669;--green-l:#d1fae5;--green-t:#065f46;
+  --red:#dc2626;--red-l:#fee2e2;--red-t:#991b1b;
+  --amber:#d97706;--amber-l:#fef3c7;--amber-t:#92400e;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--r-full:9999px;
+  --sh-sm:0 1px 3px rgba(0,0,0,.07);--sh-md:0 4px 12px rgba(0,0,0,.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-in{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:24px}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:var(--navy);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:var(--r-sm);transition:all .15s}
+.nav-links a:hover{color:var(--t1);background:var(--bg)}
+.nav-links a.active{color:var(--t1)}
+.nav-right{margin-left:auto}
+.btn-nav{background:var(--navy);color:#fff;border:none;padding:8px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.btn-nav:hover{background:var(--accent)}
+
+/* GATE (not logged in) */
+.gate{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 64px);padding:40px 24px}
+.gate-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:52px 44px;text-align:center;max-width:440px;width:100%;box-shadow:var(--sh-md)}
+.gate-icon{font-size:48px;margin-bottom:20px}
+.gate-card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:24px;margin-bottom:10px}
+.gate-card p{color:var(--t2);font-size:15px;margin-bottom:28px}
+.btn-login{background:var(--navy);color:#fff;border:none;padding:14px 32px;border-radius:var(--r-full);font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s;width:100%}
+.btn-login:hover{background:var(--accent)}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+.page-hdr{margin-bottom:36px}
+.page-hdr h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;letter-spacing:-.5px;margin-bottom:6px}
+.page-hdr p{color:var(--t2);font-size:15px}
+.user-pill{display:inline-flex;align-items:center;gap:8px;background:var(--accent-l);color:var(--accent-h);padding:4px 14px;border-radius:var(--r-full);font-size:13px;font-weight:500;margin-bottom:16px}
+.user-pill img{width:20px;height:20px;border-radius:50%;object-fit:cover}
+
+/* ESIM GRID */
+.esim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+/* ESIM CARD */
+.esim-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow .2s}
+.esim-card:hover{box-shadow:var(--sh-md)}
+.ec-banner{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:20px 22px;display:flex;align-items:center;gap:14px}
+.ec-flag{width:44px;height:33px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
+.ec-flag-fb{width:44px;height:33px;background:rgba(255,255,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ec-country{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:16px;color:#fff}
+.ec-plan{font-size:13px;color:rgba(255,255,255,.6);margin-top:2px}
+.ec-status{margin-left:auto}
+.status-badge{padding:4px 10px;border-radius:var(--r-full);font-size:12px;font-weight:600}
+.status-active{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.status-inactive{background:rgba(156,163,175,.15);color:rgba(255,255,255,.5);border:1px solid rgba(156,163,175,.2)}
+.status-expired{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.status-finished{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.status-unknown{background:rgba(156,163,175,.15);color:rgba(255,255,255,.5);border:1px solid rgba(156,163,175,.2)}
+
+.ec-body{padding:20px 22px}
+
+/* USAGE BAR */
+.usage-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.usage-title{font-size:13px;font-weight:500;color:var(--t2)}
+.usage-remaining{font-size:13px;font-weight:600;color:var(--t1)}
+.usage-bar{height:8px;background:var(--border);border-radius:var(--r-full);overflow:hidden;margin-bottom:16px}
+.usage-fill{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--accent),var(--accent-h));transition:width .6s ease;min-width:4px}
+.usage-fill.low{background:linear-gradient(90deg,var(--amber),#b45309)}
+.usage-fill.critical{background:linear-gradient(90deg,var(--red),#b91c1c)}
+
+/* ICCID ROW */
+.iccid-row{background:var(--bg);border-radius:var(--r-md);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.iccid-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);font-weight:600;margin-bottom:2px}
+.iccid-val{font-size:13px;color:var(--t1);font-family:monospace;font-weight:500;word-break:break-all}
+.copy-btn{background:none;border:none;cursor:pointer;color:var(--t3);transition:color .15s;padding:4px;border-radius:4px;flex-shrink:0}
+.copy-btn:hover{color:var(--accent)}
+
+/* META ROW */
+.ec-meta{display:flex;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.ec-meta-item{}
+.ec-meta-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);font-weight:600;margin-bottom:2px}
+.ec-meta-val{font-size:14px;color:var(--t1);font-weight:500}
+
+/* ACTIONS */
+.ec-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-topup{background:var(--navy);color:#fff;border:none;padding:10px 20px;border-radius:var(--r-full);font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s;flex:1}
+.btn-topup:hover{background:var(--accent)}
+.btn-details{background:var(--bg);color:var(--t1);border:1px solid var(--border);padding:10px 16px;border-radius:var(--r-full);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s}
+.btn-details:hover{border-color:var(--accent);color:var(--accent)}
+
+/* LOADING SKELETON */
+.skel-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-sm)}
+.skel-banner{height:80px;background:linear-gradient(90deg,#d1d5db 25%,#e5e7eb 50%,#d1d5db 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skel-body{padding:20px 22px}
+.skel-line{height:12px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-full);margin-bottom:10px}
+.skel-line.w70{width:70%}
+.skel-line.w50{width:50%}
+.skel-line.h20{height:20px;margin-bottom:14px}
+.skel-bar{height:8px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-full);margin-bottom:16px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:80px 24px}
+.empty-icon{font-size:56px;margin-bottom:20px}
+.empty h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;margin-bottom:10px}
+.empty p{color:var(--t2);font-size:15px;margin-bottom:28px}
+.btn-browse{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;padding:14px 32px;border-radius:var(--r-full);font-size:15px;font-weight:600;transition:background .15s}
+.btn-browse:hover{background:var(--accent)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal{background:#fff;width:100%;max-width:540px;border-radius:24px 24px 0 0;padding:28px 24px 36px;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 24px}
+.modal h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px;margin-bottom:6px}
+.modal p{color:var(--t2);font-size:14px;margin-bottom:20px}
+.topup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.topup-card{border:2px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;transition:all .18s;text-align:center}
+.topup-card:hover,.topup-card.sel{border-color:var(--accent);background:var(--accent-l)}
+.topup-data{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:var(--navy)}
+.topup-days{font-size:12px;color:var(--t2);margin-top:2px;margin-bottom:12px}
+.topup-price{font-weight:600;font-size:16px}
+.btn-confirm-topup{width:100%;background:var(--navy);color:#fff;border:none;padding:14px;border-radius:var(--r-full);font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.btn-confirm-topup:hover{background:var(--accent)}
+.btn-confirm-topup:disabled{opacity:.5;cursor:not-allowed}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);line-height:1;padding:4px}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 24px}
+.foot-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:var(--t1);text-decoration:none}
+.foot-logo span{color:var(--accent)}
+.foot-copy{font-size:13px;color:var(--t3)}
+
+@media(max-width:640px){.nav-links{display:none}.esim-grid{grid-template-columns:1fr}.topup-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">Aeri<span>fy</span></a>
+    <div class="nav-links">
+      <a href="index.html">Destinations</a>
+      <a href="my-esims.html" class="active">My eSIMs</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-nav" id="auth-btn">Sign In</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Login gate (shown when not authenticated) -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-icon">📱</div>
+    <h2>Your eSIM Dashboard</h2>
+    <p>Sign in to view your eSIMs, check data usage, and top up your plans.</p>
+    <button class="btn-login" id="gate-login-btn">Sign In to Continue</button>
+  </div>
+</div>
+
+<!-- Authenticated view -->
+<div style="display:none" id="auth-view">
+  <div class="page">
+    <div class="page-hdr">
+      <div class="user-pill" id="user-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="user-email">Loading…</span>
+      </div>
+      <h1>My eSIMs</h1>
+      <p>Manage your active plans and top up data</p>
+    </div>
+    <div class="esim-grid" id="esim-grid">
+      <!-- Skeletons -->
+      <div class="skel-card"><div class="skel-banner"></div><div class="skel-body"><div class="skel-line w70 h20"></div><div class="skel-bar"></div><div class="skel-line w50"></div></div></div>
+      <div class="skel-card"><div class="skel-banner"></div><div class="skel-body"><div class="skel-line w70 h20"></div><div class="skel-bar"></div><div class="skel-line w50"></div></div></div>
+    </div>
+  </div>
+  <footer>
+    <div class="foot-in">
+      <a href="index.html" class="foot-logo">Aeri<span>fy</span></a>
+      <span class="foot-copy">© 2025 Aerify. Powered by Airalo.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- Top-up modal -->
+<div class="modal-overlay" id="topup-modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeTopupModal()">✕</button>
+    <h3>Top Up Data</h3>
+    <p id="modal-desc">Select a top-up package to add data to your eSIM.</p>
+    <div class="topup-grid" id="topup-grid"></div>
+    <button class="btn-confirm-topup" id="confirm-topup-btn" disabled onclick="confirmTopup()">Select a package</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   CONFIG — update these values
+   ═══════════════════════════════ */
+const AUTH0_DOMAIN    = 'YOUR_AUTH0_DOMAIN';
+const AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
+const API_BASE        = 'https://backend.tayre0089.workers.dev';
+/* ═══════════════════════════════ */
+
+let auth0Client  = null;
+let currentUser  = null;
+let activeIccid  = null;
+let selectedTopup = null;
+
+(async () => {
+  await initAuth0();
+})();
+
+async function initAuth0() {
+  try {
+    auth0Client = await auth0.createAuth0Client({
+      domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
+      authorizationParams: { redirect_uri: `${location.origin}/my-esims.html` }
+    });
+    if (location.search.includes('code=') && location.search.includes('state=')) {
+      await auth0Client.handleRedirectCallback();
+      window.history.replaceState({}, document.title, location.pathname);
+    }
+    const isAuth = await auth0Client.isAuthenticated().catch(()=>false);
+    if (isAuth) {
+      await showDashboard();
+    } else {
+      showGate();
+    }
+  } catch(e) {
+    console.warn('Auth0 init', e);
+    showGate();
+  }
+}
+
+function showGate() {
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('auth-view').style.display = 'none';
+  document.getElementById('auth-btn').textContent = 'Sign In';
+  document.getElementById('auth-btn').onclick = login;
+  document.getElementById('gate-login-btn').onclick = login;
+}
+
+function login() {
+  auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: `${location.origin}/my-esims.html` } });
+}
+
+async function showDashboard() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('auth-view').style.display = 'block';
+  currentUser = await auth0Client.getUser();
+  document.getElementById('user-email').textContent = currentUser.email || currentUser.name || 'You';
+  document.getElementById('auth-btn').textContent = 'Sign Out';
+  document.getElementById('auth-btn').onclick = () => auth0Client.logout({ logoutParams: { returnTo: `${location.origin}/index.html` } });
+  await loadEsims();
+}
+
+async function loadEsims() {
+  try {
+    const token = await auth0Client.getTokenSilently();
+    const res = await fetch(`${API_BASE}/my-esims`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('fetch failed');
+    const { esims } = await res.json();
+    renderEsims(esims || []);
+  } catch(e) {
+    renderEsims([]);
+    console.error('loadEsims', e);
+  }
+}
+
+function renderEsims(esims) {
+  const grid = document.getElementById('esim-grid');
+  if (!esims.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-icon">📱</div>
+      <h3>No eSIMs yet</h3>
+      <p>Purchase your first eSIM to get connected instantly.</p>
+      <a href="index.html" class="btn-browse">Browse Destinations</a>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = esims.map(sim => renderEsimCard(sim)).join('');
+}
+
+function renderEsimCard(sim) {
+  const pct = sim.usage ? Math.round((sim.usage.remaining / sim.usage.total) * 100) : 100;
+  const fillClass = pct < 10 ? 'critical' : pct < 25 ? 'low' : '';
+  const remainMB = sim.usage?.remaining ?? null;
+  const totalMB  = sim.usage?.total ?? null;
+  const fmtData  = mb => mb >= 1024 ? `${(mb/1024).toFixed(1)} GB` : `${mb} MB`;
+  const status   = (sim.usage?.status || 'UNKNOWN').toUpperCase();
+  const statusClass = {
+    'ACTIVE':'active','NOT_ACTIVE':'inactive','FINISHED':'finished',
+    'EXPIRED':'expired','UNKNOWN':'unknown'
+  }[status] || 'unknown';
+  const statusLabel = {
+    'ACTIVE':'Active','NOT_ACTIVE':'Not Activated','FINISHED':'Used Up',
+    'EXPIRED':'Expired','UNKNOWN':'Unknown'
+  }[status] || status;
+
+  return `
+  <div class="esim-card">
+    <div class="ec-banner">
+      <img class="ec-flag" src="${sim.imageUrl||''}" alt="" onerror="this.outerHTML='<div class=ec-flag-fb>🌍</div>'">
+      <div>
+        <div class="ec-country">${sim.country || 'Unknown'}</div>
+        <div class="ec-plan">${sim.planName || sim.packageId || ''}</div>
+      </div>
+      <div class="ec-status">
+        <span class="status-badge status-${statusClass}">${statusLabel}</span>
+      </div>
+    </div>
+    <div class="ec-body">
+      ${totalMB !== null ? `
+      <div class="usage-label">
+        <span class="usage-title">Data remaining</span>
+        <span class="usage-remaining">${fmtData(remainMB)} of ${fmtData(totalMB)}</span>
+      </div>
+      <div class="usage-bar">
+        <div class="usage-fill ${fillClass}" style="width:${Math.max(pct,0)}%"></div>
+      </div>` : `
+      <div style="color:var(--t3);font-size:13px;margin-bottom:16px;text-align:center;padding:12px;background:var(--bg);border-radius:var(--r-md)">
+        Activate your eSIM to see usage
+      </div>`}
+      <div class="iccid-row">
+        <div>
+          <div class="iccid-label">ICCID</div>
+          <div class="iccid-val" id="iccid-${sim.iccid}">${sim.iccid}</div>
+        </div>
+        <button class="copy-btn" title="Copy ICCID" onclick="copyIccid('${sim.iccid}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div class="ec-meta">
+        <div class="ec-meta-item">
+          <div class="ec-meta-label">Purchased</div>
+          <div class="ec-meta-val">${sim.orderedAt ? new Date(sim.orderedAt).toLocaleDateString() : '—'}</div>
+        </div>
+        ${sim.usage?.expired_at ? `<div class="ec-meta-item">
+          <div class="ec-meta-label">Expires</div>
+          <div class="ec-meta-val">${new Date(sim.usage.expired_at).toLocaleDateString()}</div>
+        </div>` : ''}
+        <div class="ec-meta-item">
+          <div class="ec-meta-label">Data plan</div>
+          <div class="ec-meta-val">${sim.dataAmount || '—'}</div>
+        </div>
+      </div>
+      <div class="ec-actions">
+        <button class="btn-topup" onclick="openTopup('${sim.iccid}','${(sim.country||'').replace(/'/g,"\\'")}')">+ Top Up Data</button>
+        ${sim.qrcodeUrl ? `<button class="btn-details" onclick="window.open('${sim.qrcodeUrl}','_blank')">QR Code</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function copyIccid(iccid) {
+  navigator.clipboard.writeText(iccid).catch(() => {});
+  const el = document.getElementById(`iccid-${iccid}`);
+  const orig = el.textContent;
+  el.textContent = 'Copied!';
+  setTimeout(() => el.textContent = orig, 1500);
+}
+
+// ── TOP UP MODAL ──
+async function openTopup(iccid, country) {
+  activeIccid = iccid;
+  selectedTopup = null;
+  document.getElementById('modal-desc').textContent = `Add more data to your ${country} eSIM.`;
+  document.getElementById('topup-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--t2)">Loading packages…</div>';
+  document.getElementById('confirm-topup-btn').disabled = true;
+  document.getElementById('confirm-topup-btn').textContent = 'Select a package';
+  document.getElementById('topup-modal').style.display = 'flex';
+
+  try {
+    const token = await auth0Client.getTokenSilently();
+    const res = await fetch(`${API_BASE}/topup-packages/${iccid}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error();
+    const { packages } = await res.json();
+    if (!packages?.length) {
+      document.getElementById('topup-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--t2)">No top-up packages available.</div>';
+      return;
+    }
+    renderTopupPackages(packages);
+  } catch(e) {
+    document.getElementById('topup-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--red)">Failed to load packages.</div>';
+  }
+}
+
+function renderTopupPackages(packages) {
+  const grid = document.getElementById('topup-grid');
+  grid.innerHTML = packages.map(p => `
+    <div class="topup-card" id="tu-${p.id}" onclick="selectTopup(${JSON.stringify(p).replace(/"/g,'&quot;')}, this)">
+      <div class="topup-data">${p.dataAmount || p.data || '?'}</div>
+      <div class="topup-days">${p.validityDays || p.day || '?'} days</div>
+      <div class="topup-price">$${Number(p.priceUSD || p.price).toFixed(2)}</div>
+    </div>`).join('');
+}
+
+function selectTopup(pkg, el) {
+  document.querySelectorAll('.topup-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedTopup = pkg;
+  const btn = document.getElementById('confirm-topup-btn');
+  btn.disabled = false;
+  btn.textContent = `Top Up — $${Number(pkg.priceUSD || pkg.price).toFixed(2)}`;
+}
+
+async function confirmTopup() {
+  if (!selectedTopup) return;
+  const btn = document.getElementById('confirm-topup-btn');
+  btn.textContent = 'Loading…'; btn.disabled = true;
+  try {
+    const token = await auth0Client.getTokenSilently();
+    const res = await fetch(`${API_BASE}/topup-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ packageId: selectedTopup.id, iccid: activeIccid })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else throw new Error(data.error || 'No checkout URL');
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.textContent = 'Try again'; btn.disabled = false;
+  }
+}
+
+function closeTopupModal() { document.getElementById('topup-modal').style.display = 'none'; }
+function closeModal(e) { if (e.target.id === 'topup-modal') closeTopupModal(); }
+</script>
+</body>
+</html>

@@ -1,294 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>eSIM Store</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aerify — eSIM for Every Destination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <style>
-    :root {
-        --bg: #fdfdfd;
-        --card-bg: #ffffff;
-        --primary: #000000;
-        --secondary: #6e6e73;
-        --accent: #f5f5f7;
-        --border: #e5e5e5;
-    }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#0891b2;--accent-h:#0e7490;--accent-l:rgba(8,145,178,0.1);
+  --navy:#0c1a2e;--navy2:#162235;
+  --bg:#f8fafc;--card:#ffffff;--border:#e2e8f0;
+  --t1:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --green:#059669;--red:#dc2626;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--r-full:9999px;
+  --sh-sm:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:0 4px 12px rgba(0,0,0,.08);--sh-lg:0 8px 24px rgba(0,0,0,.1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;-webkit-font-smoothing:antialiased}
 
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: var(--bg);
-        color: #1d1d1f;
-    }
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-in{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:24px}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:var(--navy);text-decoration:none;letter-spacing:-.5px;flex-shrink:0}
+.logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:var(--r-sm);transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--t1);background:var(--bg)}
+#my-esims-nav{display:none}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.btn-signin{background:var(--navy);color:#fff;border:none;padding:8px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.btn-signin:hover{background:var(--accent)}
 
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 40px 20px;
-    }
+/* HERO */
+.hero{background:linear-gradient(140deg,#0c1a2e 0%,#0f2847 45%,#0a2240 100%);color:#fff;padding:80px 24px 96px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(8,145,178,.25) 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.hero-in{max-width:680px;margin:0 auto;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(8,145,178,.15);border:1px solid rgba(8,145,178,.3);color:#67e8f9;padding:4px 14px;border-radius:var(--r-full);font-size:13px;font-weight:500;margin-bottom:28px}
+.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(38px,6vw,66px);line-height:1.08;letter-spacing:-2px;margin-bottom:18px}
+.hero h1 .hl{color:#67e8f9}
+.hero p{font-size:17px;color:rgba(255,255,255,.6);margin-bottom:42px}
+.search-wrap{position:relative;max-width:460px;margin:0 auto}
+.search-wrap svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none}
+#search{width:100%;padding:16px 24px 16px 50px;border-radius:var(--r-full);border:none;font-size:16px;font-family:'DM Sans',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.3);outline:none;transition:box-shadow .2s;color:var(--t1)}
+#search:focus{box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 0 3px rgba(8,145,178,.35)}
+#search::placeholder{color:var(--t3)}
 
-    /* Search Header */
-    .hero-section { text-align: center; margin-bottom: 40px; }
-    h1 { font-size: 40px; font-weight: 700; margin-bottom: 24px; }
+/* STATS */
+.stats{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-xl);padding:20px 32px;display:inline-flex;gap:32px;margin-top:40px}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;color:#fff}
+.stat-lbl{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px}
 
-    .search-wrapper {
-        position: relative;
-        max-width: 500px;
-        margin: 0 auto;
-    }
+/* DESTINATIONS */
+.dest{max-width:1200px;margin:0 auto;padding:52px 24px 80px}
+.dest-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px}
+.dest-hdr h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px}
+#count{font-size:13px;color:var(--t3)}
 
-    #search {
-        width: 100%;
-        padding: 16px 20px;
-        border-radius: 30px;
-        border: 1px solid var(--border);
-        font-size: 16px;
-        background: white;
-        transition: all 0.2s;
-        box-sizing: border-box;
-    }
+/* GRID */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit}
+.ccard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh-md)}
+.cflag{width:42px;height:31px;object-fit:cover;border-radius:4px;border:1px solid var(--border);flex-shrink:0}
+.cflag-fallback{width:42px;height:31px;background:var(--accent-l);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cname{font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.cfrom{font-size:12px;color:var(--t2);margin-top:2px;display:block}
 
-    /* Country Grid */
-    .country-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 16px;
-    }
+/* SKELETON */
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-lg);height:67px;border:none;cursor:default}
+.skel:hover{transform:none;box-shadow:none}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-    .country-card {
-        background: white;
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
+/* EMPTY */
+.empty{grid-column:1/-1;text-align:center;padding:64px 24px;color:var(--t2)}
+.empty h3{font-size:17px;color:var(--t1);margin-bottom:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:600}
 
-    .country-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-        border-color: var(--primary);
-    }
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:36px 24px}
+.foot-in{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.foot-logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:var(--t1);text-decoration:none}
+.foot-logo span{color:var(--accent)}
+.foot-copy{font-size:13px;color:var(--t3)}
 
-    .country-card img {
-        width: 40px;
-        height: 30px;
-        object-fit: cover;
-        border-radius: 4px;
-        border: 1px solid #eee;
-    }
-
-    /* Detail View */
-    .breadcrumb { font-size: 14px; color: var(--secondary); margin-bottom: 15px; }
-    .back-link { cursor: pointer; color: #0071e3; text-decoration: none; font-weight: 500; }
-
-    .detail-header { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
-    
-    .validity-section { margin-bottom: 40px; }
-    .validity-title { 
-        font-size: 18px; 
-        font-weight: 600; 
-        margin-bottom: 15px; 
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .package-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 20px;
-    }
-
-    .pkg-card {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        transition: border-color 0.2s;
-    }
-
-    .pkg-card:hover { border-color: #000; }
-    .pkg-data { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-    .pkg-subtext { color: var(--secondary); font-size: 14px; margin-bottom: 20px; }
-    
-    .price-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-    }
-
-    .pkg-price { font-size: 20px; font-weight: 600; }
-    .go-btn {
-        background: var(--accent);
-        border: none;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 18px;
-        transition: all 0.2s;
-    }
-
-    .pkg-card:hover .go-btn { background: #000; color: #fff; }
-
-    .hidden { display: none; }
+@media(max-width:640px){
+  .stats{gap:20px;padding:16px 20px}
+  .nav-links{display:none}
+  .foot-in{justify-content:center;text-align:center}
+}
 </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="main-view">
-        <div class="hero-section">
-            <h1>Destinations</h1>
-            <div class="search-wrapper">
-                <input type="text" id="search" placeholder="Search for a country...">
-            </div>
-        </div>
-        <div id="country-list" class="country-grid"></div>
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">Aeri<span>fy</span></a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Destinations</a>
+      <a href="my-esims.html" id="my-esims-nav">My eSIMs</a>
     </div>
-
-    <div id="detail-view" class="hidden">
-        <nav class="breadcrumb">
-            <span class="back-link" onclick="showMainView()">Destinations</span> / <span id="bread-country">Country</span>
-        </nav>
-        
-        <div class="detail-header" id="detail-header-content"></div>
-        <div id="package-sections"></div>
+    <div class="nav-right">
+      <button class="btn-signin" id="auth-btn">Sign In</button>
     </div>
+  </div>
+</nav>
 
-    <div id="status" style="text-align:center; margin-top:50px; color:#999;">Loading eSIM plans...</div>
-</div>
+<section class="hero">
+  <div class="hero-in">
+    <div class="hero-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      eSIMs for 200+ countries &amp; regions
+    </div>
+    <h1>Stay connected<br><span class="hl">everywhere</span> you go.</h1>
+    <p>Instant eSIM delivery. No physical SIM needed.<br>Plans from $1.99 — activate in minutes.</p>
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search" placeholder="Search for a destination..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="stats">
+      <div><div class="stat-num">200+</div><div class="stat-lbl">Countries</div></div>
+      <div><div class="stat-num">$1.99</div><div class="stat-lbl">Starting from</div></div>
+      <div><div class="stat-num">Instant</div><div class="stat-lbl">Activation</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="dest">
+  <div class="dest-hdr">
+    <h2>All Destinations</h2>
+    <span id="count"></span>
+  </div>
+  <div class="cgrid" id="cgrid">
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+    <div class="ccard skel"></div><div class="ccard skel"></div><div class="ccard skel"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-in">
+    <a href="index.html" class="foot-logo">Aeri<span>fy</span></a>
+    <span class="foot-copy">© 2025 Aerify. Powered by Airalo.</span>
+  </div>
+</footer>
 
 <script>
-const API_BASE = "https://backend.tayre0089.workers.dev";
-let allPlans = [];
+/* ═══════════════════════════════
+   CONFIG — update these values
+   ═══════════════════════════════ */
+const AUTH0_DOMAIN    = 'YOUR_AUTH0_DOMAIN';    // e.g. dev-abc123.us.auth0.com
+const AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID'; // from Auth0 dashboard
+const API_BASE        = 'https://backend.tayre0089.workers.dev';
+/* ═══════════════════════════════ */
 
-/* --- Extract Days from Name String --- */
-function extractDays(name) {
-    const match = name.match(/(\d+)\s*day/i);
-    return match ? parseInt(match[1]) : 0;
-}
+let auth0Client = null;
+let allCountries = [];
 
-async function loadPlans() {
-    try {
-        const res = await fetch(API_BASE + "/products");
-        allPlans = await res.json();
-        document.getElementById("status").style.display = "none";
-        renderCountries();
-    } catch (e) {
-        document.getElementById("status").textContent = "Failed to load products.";
+(async () => {
+  await initAuth0();
+  await loadProducts();
+})();
+
+async function initAuth0() {
+  try {
+    auth0Client = await auth0.createAuth0Client({
+      domain: AUTH0_DOMAIN,
+      clientId: AUTH0_CLIENT_ID,
+      authorizationParams: { redirect_uri: `${location.origin}/index.html` }
+    });
+
+    if (location.search.includes('code=') && location.search.includes('state=')) {
+      await auth0Client.handleRedirectCallback();
+      window.history.replaceState({}, document.title, location.pathname);
+      const ret = sessionStorage.getItem('aerify_return');
+      if (ret) { sessionStorage.removeItem('aerify_return'); window.location.href = ret; return; }
     }
+    updateNavAuth();
+  } catch(e) { console.warn('Auth0 init failed', e); }
 }
 
-function renderCountries() {
-    const q = document.getElementById("search").value.toLowerCase();
-    const list = document.getElementById("country-list");
-    list.innerHTML = "";
-    
-    const unique = [...new Set(allPlans.map(p => p.country))].sort();
-    const filtered = unique.filter(c => c.toLowerCase().includes(q));
-
-    filtered.forEach(name => {
-        const pkg = allPlans.find(p => p.country === name);
-        const card = document.createElement("div");
-        card.className = "country-card";
-        card.innerHTML = `<img src="${pkg.imageUrl}"> <span>${name}</span>`;
-        card.onclick = () => showDetail(name);
-        list.appendChild(card);
-    });
+async function updateNavAuth() {
+  if (!auth0Client) return;
+  const isAuth = await auth0Client.isAuthenticated().catch(() => false);
+  const btn = document.getElementById('auth-btn');
+  const myNav = document.getElementById('my-esims-nav');
+  if (isAuth) {
+    btn.textContent = 'Sign Out';
+    btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: `${location.origin}/index.html` } });
+    if (myNav) myNav.style.display = 'inline';
+  } else {
+    btn.textContent = 'Sign In';
+    btn.onclick = () => auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: `${location.origin}/index.html` } });
+  }
 }
 
-function showDetail(countryName) {
-    document.getElementById("main-view").classList.add("hidden");
-    document.getElementById("detail-view").classList.remove("hidden");
-    document.getElementById("bread-country").textContent = countryName;
-    window.scrollTo(0,0);
+async function loadProducts() {
+  try {
+    const res = await fetch(`${API_BASE}/products`);
+    if (!res.ok) throw new Error('fetch failed');
+    const products = await res.json();
 
-    const pkgs = allPlans.filter(p => p.country === countryName);
-    
-    const header = document.getElementById("detail-header-content");
-    header.innerHTML = `
-        <img src="${pkgs[0].imageUrl}" style="width:50px; border-radius:8px;">
-        <h2 style="font-size:32px; margin:0">eSIM for ${countryName}</h2>
-    `;
-
-    const sectionsContainer = document.getElementById("package-sections");
-    sectionsContainer.innerHTML = "";
-
-    const groups = {};
-    pkgs.forEach(p => {
-        const days = extractDays(p.name);
-        if (!groups[days]) groups[days] = [];
-        groups[days].push(p);
-    });
-
-    Object.keys(groups).sort((a,b) => a - b).forEach(days => {
-        const section = document.createElement("div");
-        section.className = "validity-section";
-        section.innerHTML = `<div class="validity-title">${days > 0 ? days + ' Days' : 'Plan Details'}</div>`;
-        
-        const grid = document.createElement("div");
-        grid.className = "package-grid";
-
-        groups[days].sort((a,b) => a.priceUSD - b.priceUSD).forEach(pkg => {
-            const card = document.createElement("div");
-            card.className = "pkg-card";
-            card.innerHTML = `
-                <div>
-                    <div class="pkg-data">${pkg.dataAmount}</div>
-                    <div class="pkg-subtext">Validity: ${days > 0 ? days + ' days' : 'See name'}</div>
-                </div>
-                <div class="price-row">
-                    <div class="pkg-price">$${pkg.priceUSD.toFixed(2)}</div>
-                    <button class="go-btn" onclick="buyEsim('${pkg.id}', this)">→</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-        
-        section.appendChild(grid);
-        sectionsContainer.appendChild(section);
-    });
-}
-
-function showMainView() {
-    document.getElementById("detail-view").classList.add("hidden");
-    document.getElementById("main-view").classList.remove("hidden");
-}
-
-async function buyEsim(packageId, btn) {
-    const original = btn.textContent;
-    btn.textContent = "...";
-    btn.disabled = true;
-    try {
-        const res = await fetch(API_BASE + "/create-checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ packageId })
-        });
-        const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url;
-        } else {
-            throw new Error(data.error || "No checkout URL returned");
-        }
-    } catch (err) {
-        alert("Payment error: " + err.message);
-        btn.textContent = original;
-        btn.disabled = false;
+    const map = {};
+    for (const p of products) {
+      if (!map[p.country]) map[p.country] = { name: p.country, cc: p.countryCode, img: p.imageUrl, min: p.priceUSD };
+      else if (p.priceUSD < map[p.country].min) map[p.country].min = p.priceUSD;
     }
+    allCountries = Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
+    renderGrid(allCountries);
+  } catch (e) {
+    document.getElementById('cgrid').innerHTML = '<div class="empty"><h3>Failed to load destinations</h3><p>Check your connection and refresh.</p></div>';
+  }
 }
 
-document.getElementById("search").addEventListener("input", renderCountries);
-loadPlans();
+function renderGrid(list) {
+  const grid = document.getElementById('cgrid');
+  const count = document.getElementById('count');
+  count.textContent = `${list.length} destination${list.length !== 1 ? 's' : ''}`;
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty"><h3>No results found</h3><p>Try a different search term.</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(c => `
+    <a class="ccard" href="country.html?cc=${encodeURIComponent(c.cc)}&name=${encodeURIComponent(c.name)}">
+      <img class="cflag" src="${c.img}" alt="" loading="lazy" onerror="this.outerHTML='<div class=cflag-fallback>🌍</div>'">
+      <div>
+        <span class="cname">${c.name}</span>
+        <span class="cfrom">From $${c.min.toFixed(2)}</span>
+      </div>
+    </a>`).join('');
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  renderGrid(q ? allCountries.filter(c => c.name.toLowerCase().includes(q)) : allCountries);
+});
 </script>
 </body>
 </html>
