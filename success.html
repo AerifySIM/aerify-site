@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful – eSIM Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { margin-top: 0; font-size: 28px; }
+        .success-icon { font-size: 64px; margin: 10px 0; }
+        #status {
+            margin: 20px 0;
+            font-size: 16px;
+            color: #555;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e5e5e5;
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .done { color: #1a7a3c; font-weight: 500; }
+        .error { color: #d32f2f; font-weight: 500; }
+        p { font-size: 15px; color: #666; margin: 0 0 20px; }
+        .button {
+            display: inline-block;
+            background: black;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="success-icon">✅</div>
+        <h1>Payment Successful!</h1>
+        <p>Thank you for your purchase. Your eSIM details will be sent to your email shortly.</p>
+        <div id="status">
+            <div class="spinner" id="spinner"></div>
+            <span id="status-text">Completing your order...</span>
+        </div>
+        <a href="/" class="button">← Back to Store</a>
+    </div>
+
+    <script>
+        const API_BASE = "https://backend.tayre0089.workers.dev";
+        const statusText = document.getElementById("status-text");
+        const spinner = document.getElementById("spinner");
+        const sessionId = new URLSearchParams(window.location.search).get("session_id");
+
+        if (!sessionId) {
+            spinner.style.display = "none";
+            statusText.innerHTML = '<span class="error">Missing session info. Please contact support.</span>';
+        } else {
+            pollStatus();
+        }
+
+        async function pollStatus(attempts = 0) {
+            if (attempts > 12) {
+                spinner.style.display = "none";
+                statusText.textContent = "Still processing — check your email for your eSIM.";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/order-status?session_id=${encodeURIComponent(sessionId)}`);
+                if (!res.ok) throw new Error("status check failed");
+                const { status } = await res.json();
+
+                if (status === "fulfilled") {
+                    spinner.style.display = "none";
+                    statusText.innerHTML = '<span class="done">✓ Order complete! Check your email for your eSIM.</span>';
+                } else if (status === "processing") {
+                    statusText.textContent = "Processing your order...";
+                    setTimeout(() => pollStatus(attempts + 1), 3000);
+                } else {
+                    // pending — webhook hasn't fired yet, keep polling
+                    statusText.textContent = "Confirming payment...";
+                    setTimeout(() => pollStatus(attempts + 1), 3000);
+                }
+            } catch {
+                setTimeout(() => pollStatus(attempts + 1), 4000);
+            }
+        }
+    </script>
+</body>
+</html>
