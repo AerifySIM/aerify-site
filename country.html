@@ -239,7 +239,7 @@ async function updateNavAuth() {
   const myNav = document.getElementById('my-esims-nav');
   if (isAuth) {
     btn.textContent = 'Sign Out';
-    btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: `${location.origin}/index.html` } });
+    btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: `${location.origin}/aerify-site/index.html` } });
     if (myNav) myNav.style.display = 'inline';
   } else {
     btn.textContent = 'Sign In';
@@ -250,7 +250,7 @@ async function updateNavAuth() {
 function loginAndReturn() {
   if (selectedPkg) sessionStorage.setItem('aerify_checkout', selectedPkg.id);
   auth0Client.loginWithRedirect({
-    authorizationParams: { redirect_uri: `${location.origin}/country.html?cc=${CC}&name=${encodeURIComponent(CNAME)}` }
+    authorizationParams: { redirect_uri: `${location.origin}/aerify-site/country.html?cc=${CC}&name=${encodeURIComponent(CNAME)}` }
   });
 }
 

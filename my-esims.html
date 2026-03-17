@@ -234,7 +234,7 @@ async function initAuth0() {
   try {
     auth0Client = await auth0.createAuth0Client({
       domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
-      authorizationParams: { redirect_uri: `${location.origin}/my-esims.html` }
+      authorizationParams: { redirect_uri: `${location.origin}/aerify-site/my-esims.html` }
     });
     if (location.search.includes('code=') && location.search.includes('state=')) {
       await auth0Client.handleRedirectCallback();
@@ -261,7 +261,7 @@ function showGate() {
 }
 
 function login() {
-  auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: `${location.origin}/my-esims.html` } });
+  auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: `${location.origin}/aerify-site/my-esims.html` } });
 }
 
 async function showDashboard() {
