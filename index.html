@@ -226,14 +226,38 @@ function renderGrid(list) {
     grid.innerHTML = '<div class="empty"><h3>No results found</h3><p>Try a different search term.</p></div>';
     return;
   }
-  grid.innerHTML = list.map(c => `
-    <a class="ccard" href="country.html?cc=${encodeURIComponent(c.cc)}&name=${encodeURIComponent(c.name)}">
-      <img class="cflag" src="${c.img}" alt="" loading="lazy" onerror="this.outerHTML='<div class=cflag-fallback>🌍</div>'">
-      <div>
-        <span class="cname">${c.name}</span>
-        <span class="cfrom">From $${c.min.toFixed(2)}</span>
-      </div>
-    </a>`).join('');
+  grid.innerHTML = '';
+for (const c of list) {
+  const a = document.createElement('a');
+  a.className = 'ccard';
+  a.href = `country.html?cc=${encodeURIComponent(c.cc)}&name=${encodeURIComponent(c.name)}`;
+
+  const img = document.createElement('img');
+  img.className = 'cflag';
+  img.src = c.img || '';
+  img.alt = '';
+  img.loading = 'lazy';
+  img.onerror = function() {
+    const fb = document.createElement('div');
+    fb.className = 'cflag-fallback';
+    fb.textContent = '🌍';
+    this.replaceWith(fb);
+  };
+
+  const info = document.createElement('div');
+  const name = document.createElement('span');
+  name.className = 'cname';
+  name.textContent = c.name;
+  const from = document.createElement('span');
+  from.className = 'cfrom';
+  from.textContent = `From $${c.min.toFixed(2)}`;
+  info.appendChild(name);
+  info.appendChild(from);
+
+  a.appendChild(img);
+  a.appendChild(info);
+  grid.appendChild(a);
+}
 }
 
 document.getElementById('search').addEventListener('input', e => {
