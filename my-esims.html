@@ -236,7 +236,8 @@ async function initAuth0() {
   domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
   authorizationParams: {
     redirect_uri: `${location.origin}/aerify-site/my-esims.html`,
-    audience: `https://aerify-api`
+    audience: `https://aerify-api`,
+    scope: 'openid profile email'
   }
 });
     if (location.search.includes('code=') && location.search.includes('state=')) {
