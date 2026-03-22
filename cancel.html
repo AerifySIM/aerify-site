@@ -22,6 +22,7 @@ p{color:var(--t2);font-size:15px;margin-bottom:6px}
 .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 .logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:var(--navy);text-decoration:none;position:fixed;top:20px;left:28px}
 .logo span{color:var(--accent)}
+button.btn-primary{width:100%;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
 </style>
 </head>
 <body>
@@ -33,7 +34,7 @@ p{color:var(--t2);font-size:15px;margin-bottom:6px}
   <p>No charges have been made to your account.</p>
   <div class="divider"></div>
   <div class="actions">
-    <a href="javascript:history.back()" class="btn-primary">← Try Again</a>
+    <button onclick="history.back()" class="btn-primary">← Try Again</button>
     <a href="index.html" class="btn-secondary">Back to Store</a>
   </div>
 </div>

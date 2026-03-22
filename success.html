@@ -10,7 +10,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--accent:#0891b2;--navy:#0c1a2e;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--t1:#111827;--t2:#6b7280;--green:#059669;--green-l:#d1fae5;--red:#dc2626}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
-.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:480px;width:100%;text-align:center;}
 .icon{font-size:56px;margin-bottom:20px}
 h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.5px;margin-bottom:10px}
 .sub{color:var(--t2);font-size:15px;margin-bottom:28px}
@@ -80,7 +80,8 @@ async function poll(attempts = 0) {
       setTimeout(() => poll(attempts + 1), 3000);
     }
   } catch {
-    setTimeout(() => poll(attempts + 1), 4000);
+    const delay = Math.min(4000 * (attempts + 1), 20000);
+    setTimeout(() => poll(attempts + 1), delay);
   }
 }
 </script>
